@@ -39,7 +39,7 @@ class Feedwriter_Item
 	 *
 	 * @param    contant     (RSS1/RSS2/ATOM) RSS2 is default.
 	 */
-	function __construct($version = RSS2)
+	function __construct($version = FEEDWRITER_RSS2)
 	{
 		$this->version = $version;
 	}
@@ -118,7 +118,7 @@ class Feedwriter_Item
 	 */
 	public function setDescription($description)
 	{
-		$tag = ($this->version == ATOM) ? 'summary' : 'description';
+		$tag = ($this->version == FEEDWRITER_ATOM) ? 'summary' : 'description';
 		$this->addElement($tag, $description);
 	}
 
@@ -154,10 +154,10 @@ class Feedwriter_Item
 			}
 		}
 
-		if ($this->version == ATOM) {
+		if ($this->version == FEEDWRITER_ATOM) {
 			$tag = 'updated';
 			$value = date(DATE_ATOM, $date);
-		} elseif ($this->version == RSS2) {
+		} elseif ($this->version == FEEDWRITER_RSS2) {
 			$tag = 'pubDate';
 			$value = date(DATE_RSS, $date);
 		} else {
@@ -177,7 +177,7 @@ class Feedwriter_Item
 	 */
 	public function setLink($link)
 	{
-		if ($this->version == RSS2 || $this->version == RSS1) {
+		if ($this->version == FEEDWRITER_RSS2 || $this->version == FEEDWRITER_RSS1) {
 			$this->addElement('link', $link);
 		} else {
 			$this->addElement('link', '', ['href' => $link]);
@@ -197,7 +197,7 @@ class Feedwriter_Item
 	 */
 	public function setEncloser($url, $length, $type)
 	{
-		if ($this->version != RSS2) {
+		if ($this->version != FEEDWRITER_RSS2) {
 			return;
 		}
 
@@ -215,7 +215,7 @@ class Feedwriter_Item
 	 */
 	public function setAuthor($author)
 	{
-		if ($this->version != ATOM) {
+		if ($this->version != FEEDWRITER_ATOM) {
 			return;
 		}
 
@@ -231,10 +231,10 @@ class Feedwriter_Item
 	 */
 	public function setId($id)
 	{
-		if ($this->version == RSS2) {
+		if ($this->version == FEEDWRITER_RSS2) {
 			$this->addElement('guid', $id, ['isPermaLink' => 'false']);
 		} else {
-			if ($this->version == ATOM) {
+			if ($this->version == FEEDWRITER_ATOM) {
 				$this->addElement('id', FeedWriter::uuid($id, 'urn:uuid:'), null, true);
 			}
 		}

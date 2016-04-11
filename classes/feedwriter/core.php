@@ -24,9 +24,9 @@
 // RSS 0.91, 0.92, 0.93 and 0.94  Officially obsoleted by 2.0
 // So, define constants for RSS 1.0, RSS 2.0 and ATOM
 
-define('RSS1', 'RSS 1.0', true);
-define('RSS2', 'RSS 2.0', true);
-define('ATOM', 'ATOM', true);
+define('FEEDWRITER_RSS1', 'RSS 1.0', true);
+define('FEEDWRITER_RSS2', 'RSS 2.0', true);
+define('FEEDWRITER_ATOM', 'ATOM', true);
 
 /**
  * Universal Feed Writer class
@@ -51,7 +51,7 @@ abstract class Feedwriter_Core
      *
      * @param    constant    the version constant (RSS1/RSS2/ATOM).
      */
-    public function __construct($version = RSS2)
+    public function __construct($version = FEEDWRITER_RSS2)
     {
         $this->version = $version;
 
@@ -109,13 +109,13 @@ abstract class Feedwriter_Core
 
         if (!$useGenericContentType) {
             switch ($this->version) {
-                case RSS2 :
+                case FEEDWRITER_RSS2 :
                     $contentType = "application/rss+xml";
                     break;
-                case RSS1 :
+                case FEEDWRITER_RSS1 :
                     $contentType = "application/rdf+xml";
                     break;
-                case ATOM :
+                case FEEDWRITER_ATOM :
                     $contentType = "application/atom+xml";
                     break;
             }
@@ -182,7 +182,7 @@ abstract class Feedwriter_Core
      */
     public function setDate($date)
     {
-        if ($this->version != ATOM) {
+        if ($this->version != FEEDWRITER_ATOM) {
             return;
         }
 
@@ -208,7 +208,7 @@ abstract class Feedwriter_Core
      */
     public function setDescription($desciption)
     {
-        if ($this->version != ATOM) {
+        if ($this->version != FEEDWRITER_ATOM) {
             $this->setChannelElement('description', $desciption);
         }
     }
@@ -283,12 +283,12 @@ abstract class Feedwriter_Core
     {
         $out = '<?xml version="1.0" encoding="utf-8"?>' . PHP_EOL;
 
-        if ($this->version == RSS2) {
+        if ($this->version == FEEDWRITER_RSS2) {
             $out .= '<rss version="2.0" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:wfw="http://wellformedweb.org/CommentAPI/">';
-        } elseif ($this->version == RSS1) {
+        } elseif ($this->version == FEEDWRITER_RSS1) {
             $out .= '<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns="http://purl.org/rss/1.0/" xmlns:dc="http://purl.org/dc/elements/1.1/">';
         } else {
-            if ($this->version == ATOM) {
+            if ($this->version == FEEDWRITER_ATOM) {
                 $out .= '<feed xmlns="http://www.w3.org/2005/Atom">';
             }
         }
@@ -306,12 +306,12 @@ abstract class Feedwriter_Core
      */
     private function printFooter()
     {
-        if ($this->version == RSS2) {
+        if ($this->version == FEEDWRITER_RSS2) {
             echo '</channel>' . PHP_EOL . '</rss>';
-        } elseif ($this->version == RSS1) {
+        } elseif ($this->version == FEEDWRITER_RSS1) {
             echo '</rdf:RDF>';
         } else {
-            if ($this->version == ATOM) {
+            if ($this->version == FEEDWRITER_ATOM) {
                 echo '</feed>';
             }
         }
@@ -341,11 +341,11 @@ abstract class Feedwriter_Core
             $attrText = substr($attrText, 0, strlen($attrText) - 1);
         }
 
-        if (is_array($tagContent) && $this->version == RSS1) {
+        if (is_array($tagContent) && $this->version == FEEDWRITER_RSS1) {
             $attrText = ' rdf:parseType="Resource"';
         }
 
-        $attrText .= (in_array($tagName, $this->CDATAEncoding) && $this->version == ATOM) ? ' type="html"' : '';
+        $attrText .= (in_array($tagName, $this->CDATAEncoding) && $this->version == FEEDWRITER_ATOM) ? ' type="html"' : '';
         $nodeText .= "<{$tagName}{$attrText}>";
         $nodeText .= (in_array($tagName, $this->CDATAEncoding)) ? '<![CDATA[' : '';
 
@@ -373,17 +373,17 @@ abstract class Feedwriter_Core
     {
         //Start channel tag
         switch ($this->version) {
-            case RSS2:
+            case FEEDWRITER_RSS2:
                 echo '<channel>' . PHP_EOL;
                 break;
-            case RSS1:
+            case FEEDWRITER_RSS1:
                 echo (isset($this->data['ChannelAbout'])) ? "<channel rdf:about=\"{$this->data['ChannelAbout']}\">" : "<channel rdf:about=\"{$this->channels['link']}\">";
                 break;
         }
 
         //Print Items of channel
         foreach ($this->channels as $key => $value) {
-            if ($this->version == ATOM && $key == 'link') {
+            if ($this->version == FEEDWRITER_ATOM && $key == 'link') {
                 // ATOM prints link element as href attribute
                 echo $this->makeNode($key, '', ['href' => $value]);
                 //Add the id for ATOM
@@ -395,7 +395,7 @@ abstract class Feedwriter_Core
         }
 
         //RSS 1.0 have special tag <rdf:Seq> with channel
-        if ($this->version == RSS1) {
+        if ($this->version == FEEDWRITER_RSS1) {
             echo "<items>" . PHP_EOL . "<rdf:Seq>" . PHP_EOL;
             foreach ($this->items as $item) {
                 $thisItems = $item->getElements();
@@ -435,17 +435,17 @@ abstract class Feedwriter_Core
      */
     private function startItem($about = false)
     {
-        if ($this->version == RSS2) {
+        if ($this->version == FEEDWRITER_RSS2) {
             echo '<item>' . PHP_EOL;
         } else {
-            if ($this->version == RSS1) {
+            if ($this->version == FEEDWRITER_RSS1) {
                 if ($about) {
                     echo "<item rdf:about=\"$about\">" . PHP_EOL;
                 } else {
                     die("link element is not set." . PHP_EOL . "It's required for RSS 1.0 to be used as the about attribute of the item tag.");
                 }
             } else {
-                if ($this->version == ATOM) {
+                if ($this->version == FEEDWRITER_ATOM) {
                     echo "<entry>" . PHP_EOL;
                 }
             }
@@ -460,10 +460,10 @@ abstract class Feedwriter_Core
      */
     private function endItem()
     {
-        if ($this->version == RSS2 || $this->version == RSS1) {
+        if ($this->version == FEEDWRITER_RSS2 || $this->version == FEEDWRITER_RSS1) {
             echo '</item>' . PHP_EOL;
         } else {
-            if ($this->version == ATOM) {
+            if ($this->version == FEEDWRITER_ATOM) {
                 echo "</entry>" . PHP_EOL;
             }
         }
