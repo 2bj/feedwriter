@@ -5,13 +5,13 @@ https://github.com/mibe/FeedWriter
 
 ## Example
 ```php
-class News_Controller extends Controller {
+class Controller_News extends Controller {
 
     public function action_feed()
     {
         $Feed = new Feedwriter(FEEDWRITER_RSS2);
         $Feed->setTitle('News');
-        $Feed->setLink('http://exmpale.com/news/rss');
+        $Feed->setLink('http://exmpale.com/news/feed');
         $Feed->setDescription('Super news');
         $Feed->setChannelElement('language', 'kg');
         $Feed->setChannelElement('pubDate', date(DATE_RSS, time()));
